@@ -44,22 +44,31 @@ public class ForofygadesMain {
 		try {
 			while(true) {
 				// 1. Read the forofygades file for the first set of details.
+				
+				// Each set contains 50 + 60 + 50 + 4(ints have 4) bytes.
+				// Multiply by the index to get the seeking position.
+				// Subtract 1 to start from 0.
 				forofygades.seek((50+60+50+4)*(index_foro - 1));  //Position of the current record in bytes
-				String name = readString(50, forofygades);
-				String address = readString(60, forofygades);
-				String tel = readString(50, forofygades);
-				int det_pos = forofygades.readInt();
+				String name = readString(50, forofygades);  // Name
+				String address = readString(60, forofygades);  // Address
+				String tel = readString(50, forofygades);  // Phone number
+				int det_pos = forofygades.readInt();  // Position in the details file.
+				
 				// Create a new forofygas object
 				Forofygas fucker = new Forofygas(name, address, tel, det_pos);
 				
 				// 2. Read details.dbs and get the rest of the details.
+				// Again, same as before... (Doubles take 8 bytes)
 				details.seek((8+50+60) * (fucker.details_pos - 1));
-				double xreos = details.readDouble();
-				String fm = readString(50, details);
-				String pm = readString(60, details);
+				double xreos = details.readDouble();  // Existing debt
+				String fm = readString(50, details);  // Forologiko Mitrwo
+				String pm = readString(60, details);  // Poiniko Mitrwo
+				
+				// Set the details to the forofygas object.
 				fucker.for_m = fm;
 				fucker.xreos = xreos;
 				fucker.poin_m = pm;
+				
 				// 3. Add to the list of good people.
 				forofygades_c.add(fucker);
 				
@@ -88,11 +97,12 @@ public class ForofygadesMain {
 		for (Forofygas fucker : forofygades_c) {
 			// If both debts are GT 30.000, send him to jail...
 			if (fucker.xreos > 30000.0 && fucker.xreos_new > 30000.0) { 
-				fw.write(fucker.name);
-				fw.write(fucker.address);
-				fw.write(fucker.poin_m);
-				fw.write(String.valueOf(fucker.xreos_new));
-				fw.write(System.lineSeparator());
+				//Write to the jail text file:
+				fw.write(fucker.name);  // Name
+				fw.write(fucker.address);  // Address
+				fw.write(fucker.poin_m);  // Poiniko Mitrwo
+				fw.write(String.valueOf(fucker.xreos_new));  // New Debt
+				fw.write(System.lineSeparator());  // A newline separator (depends on the executing OS: \n for Linux/Mac, \r\n for Windows).
 			}
 		}
 
